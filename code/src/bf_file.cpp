@@ -3,6 +3,7 @@
 #include "bf.h"
 #include "hash_file.h"
 
+using nanespace std;
 
 typedef struct BF_Block {
     Record *Array;
