@@ -30,3 +30,25 @@ void BF_Block_SetDirty(BF_Block *block)
 {
     block->DirtyStatus = true;
 }
+
+char* BF_Block_GetData(const BF_Block *block)
+{
+    char** Data = new char*[30];
+    for(int i  = 0;i < 10 ; i++)
+    {
+        Data[i] = block->Array->city;
+        Data[i+1] = block->Array->name;
+        Data[i+2] = block->Array->surname;
+    }
+    return *Data;
+}
+
+int main()
+{
+    BF_Block *A;
+    BF_Block_Init(&A);
+    BF_Block_SetDirty(A);
+    BF_Block_GetData(A);
+    BF_Block_Destroy(&A);
+    return 0;
+}
