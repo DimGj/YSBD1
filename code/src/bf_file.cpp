@@ -25,3 +25,8 @@ void BF_Block_Destroy(BF_Block **block)
     delete[] (*block)->Array;               //delete first the array of records and then the whole block
     delete *block;
 }
+
+void BF_Block_SetDirty(BF_Block *block)
+{
+    block->DirtyStatus = true;
+}
