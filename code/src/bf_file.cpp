@@ -23,5 +23,5 @@ void BF_Block_Init(BF_Block **block) //When this function is called,the block ar
 void BF_Block_Destroy(BF_Block **block)
 {
     delete[] (*block)->Array;               //delete first the array of records and then the whole block
-    delete block;
+    delete *block;
 }
