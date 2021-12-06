@@ -20,3 +20,8 @@ void BF_Block_Init(BF_Block **block) //When this function is called,the block ar
     (*block)->Pinned = false;
 } 
 
+void BF_Block_Destroy(BF_Block **block)
+{
+    delete[] (*block)->Array;
+    delete block;
+}
