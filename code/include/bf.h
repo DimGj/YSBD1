@@ -8,6 +8,8 @@ extern "C" {
 #define BF_BLOCK_SIZE 512      /* Το μέγεθος ενός block σε bytes */
 #define BF_BUFFER_SIZE 100     /* Ο μέγιστος αριθμός block που κρατάμε στην μνήμη */
 #define BF_MAX_OPEN_FILES 100  /* Ο μέγιστος αριθμός ανοικτών αρχείων */
+#define BF_MAX_BLOCKS_PER_FILE 20 
+
 
 typedef enum BF_ErrorCode {
   BF_OK,
@@ -25,6 +27,8 @@ typedef enum ReplacementAlgorithm {
   LRU,
   MRU
 } ReplacementAlgorithm;
+
+string* FileArray = new string[20]; //Array which holds all the files.
 
 
 // Δομή Block
@@ -56,7 +60,7 @@ void BF_Block_SetDirty(BF_Block *block);
  * Άμα αλάξουμε τα δεδομένα θα πρέπει να κάνουμε το block dirty με την κλήση
  * της συνάρτησης BF_Block_GetData.
  */
-char* BF_Block_GetData(const BF_Block *block);
+char** BF_Block_GetData(const BF_Block *block);
 
 /*
  * Με τη συνάρτηση BF_Init πραγματοποιείται η αρχικοποίηση του επιπέδου BF.
