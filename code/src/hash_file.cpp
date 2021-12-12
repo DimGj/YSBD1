@@ -35,14 +35,14 @@ HT_ErrorCode HT_Init() {
 }
 
 HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
-  int file_desc;BF_Block* Block;
+  int file_desc;BF_Block* Block;string Data;
   CALL_BF(BF_CreateFile(filename));
   CALL_BF(BF_OpenFile(filename,&file_desc)); //epistrfei to id sto file desc
-
   CALL_BF(BF_AllocateBlock(file_desc,Block)); //meta thelei unpin,epistrfei to block sth metavlith block
-  int StartingDepth = depth;
-  //what else needs to happen here?
-  //Where does depth go?
+  Data = BF_Block_GetData(Block);
+  Data = to_string(depth);
+  CALL_BF(BF_CloseFile(file_desc));
+  CALL_BF(BF_UnpinBlock(Block));
   return HT_OK;
 }
 
