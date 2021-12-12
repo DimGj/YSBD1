@@ -47,15 +47,15 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
 }
 
 HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
-  BF_Block* Block;
-  char* ch;
   CALL_BF(BF_OpenFile(fileName,indexDesc));
-  if(indexDesc < 0)
-    return HT_ERROR;
-  else{
-    
+  for(int i = 0;i < 20; i++)
+  {
+    if(Array[i].Name.empty())
+    {
+      Array[i].Name = fileName;
+      Array[i].ID = *indexDesc;
+    }
   }
-  //insert code here
   return HT_OK;
 }
 
