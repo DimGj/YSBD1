@@ -12,7 +12,7 @@ using namespace std;
 #define CALL_BF(call)       \
 {                           \
   BF_ErrorCode code = call; \
-  if (code != BF_OK) {         \
+  if (code != BF_OK) {       \
     BF_PrintError(code);    \
     return HT_ERROR;        \
   }                         \
