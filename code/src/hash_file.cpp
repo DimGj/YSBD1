@@ -61,7 +61,9 @@ HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
 }
 
 HT_ErrorCode HT_CloseFile(int indexDesc) { //check if Records in the file changed?
-  //insert code here
+  CALL_BF(BF_CloseFile(indexDesc));
+  Array[indexDesc].Name.erase();
+  Array[indexDesc].ID = NULL;
   return HT_OK;
 }
 
