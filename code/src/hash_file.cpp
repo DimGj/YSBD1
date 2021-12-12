@@ -54,6 +54,7 @@ HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
     {
       Array[i].Name = fileName;
       Array[i].ID = *indexDesc;
+      break;
     }
   }
   return HT_OK;
