@@ -22,7 +22,6 @@ typedef struct FileList
 {
   int ID;
   string Name;
-
 }FileList;
 
 FileList* Array;
