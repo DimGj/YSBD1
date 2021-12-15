@@ -12,7 +12,7 @@ using namespace std;
 #define CALL_BF(call)       \
 {                           \
   BF_ErrorCode code = call; \
-  if (code != BF_OK) {       \
+  if (code != BF_OK) {         \
     BF_PrintError(code);    \
     return HT_ERROR;        \
   }                         \
@@ -35,12 +35,12 @@ HT_ErrorCode HT_Init() {
 }
 
 HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
-  int file_desc;BF_Block* Block;string Data;
+  int file_desc;BF_Block* Block;char* Data;
   CALL_BF(BF_CreateFile(filename));
   CALL_BF(BF_OpenFile(filename,&file_desc)); //epistrfei to id sto file desc
   CALL_BF(BF_AllocateBlock(file_desc,Block)); //meta thelei unpin,epistrfei to block sth metavlith block
   Data = BF_Block_GetData(Block);
-  Data = to_string(depth);
+  memset(Data,depth,BF_BLOCK_SIZE);
   CALL_BF(BF_CloseFile(file_desc));
   CALL_BF(BF_UnpinBlock(Block));
   return HT_OK;
@@ -67,12 +67,77 @@ HT_ErrorCode HT_CloseFile(int indexDesc){
   return HT_OK;
 }
 
+void reverse_str(string& str)
+{
+    int n = str.length();
+    for (int i = 0; i < n / 2; i++)
+        swap(str[i], str[n - i - 1]);
+}
+
+string string_to_binary(string S)
+{
+    string bin = "";
+  for(int i = 0;i < S.length(); i++)
+  {
+    int value = int(S[i]);
+    while(value > 0)
+    {
+      if(value%2)
+        bin.push_back('1');
+     else
+        bin.push_back('0');
+      value /= 2;
+    } 
+  }
+  reverse_str(bin);
+  return bin;
+}
+
+string decimal_to_binary(int Decimal)
+{
+  string Binary;
+  while(Decimal > 0)
+  {
+    Binary += to_string(Decimal  % 2);
+    Decimal /= 2;
+  }
+  reverse_str(Binary);
+  return Binary;
+}
+
 HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
   //insert code here
   return HT_OK;
 }
 
 HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
-  //insert code here
+  int j = 0;
+  for(int i = 0;i < 20;i++)
+  {
+    if(!Array[i].Name.empty())
+    {
+      if(j == indexDesc)
+      {
+          int* BlockNum;
+          CALL_BF(BF_GetBlockCounter(Array[j].ID,BlockNum));
+          BF_Block* Block;
+          for(int i = 0;i < *BlockNum; i++)
+          {
+            CALL_BF(BF_GetBlock(Array[j].ID,i,Block));//to kanei pin
+            char* Data = BF_Block_GetData(Block);
+            if(id == NULL)
+            {
+              cout<<"Records of Block : "<< i + 1<<" "<<*Data<<endl;
+            }
+            else
+            {
+              cout<<"spera"<<endl;
+            }
+            CALL_BF(BF_UnpinBlock(Block)); //needs to be here?
+          }
+      }
+    }      
+    j++;
+  }
   return HT_OK;
 }
