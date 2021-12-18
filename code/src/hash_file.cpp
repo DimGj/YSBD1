@@ -132,6 +132,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record)
       memcpy(Data,record.surname,20);
       memcpy(Data,record.city,20);
       BF_Block_SetDirty(Block);
+      CALL_BF(BF_UnpinBlock(Block)); //needs to be here?
     }
     else if(BlockCounter > 1)
     {
@@ -150,6 +151,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record)
           memcpy(Data,record.surname,20);
           memcpy(Data,record.city,20);
           BF_Block_SetDirty(Block);
+          CALL_BF(BF_UnpinBlock(Block)); //needs to be here?
           break;
         }
       }
@@ -162,6 +164,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record)
         memcpy(Data,record.surname,20);
         memcpy(Data,record.city,20);
         BF_Block_SetDirty(Block);
+        CALL_BF(BF_UnpinBlock(Block)); //needs to be here?
       }
     }
   return HT_OK;
@@ -197,4 +200,11 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
     j++;
   }
   return HT_OK;
+}
+
+void BinarySearch() //Kathe bucket einai ena Block?kai to hashing ginetai afou exoume valei to record sto arxeio?
+{
+
+
+
 }
