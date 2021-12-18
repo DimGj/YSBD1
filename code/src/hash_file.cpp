@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string>
 #include <iostream>
+#include <cstring>
 
 using namespace std;
 
@@ -40,7 +41,7 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
   CALL_BF(BF_OpenFile(filename,&file_desc)); //epistrfei to id sto file desc
   CALL_BF(BF_AllocateBlock(file_desc,Block)); //meta thelei unpin,epistrfei to block sth metavlith block
   Data = BF_Block_GetData(Block);
-  memset(Data,depth,BF_BLOCK_SIZE);
+ // memset(Data,depth,BF_BLOCK_SIZE);
   CALL_BF(BF_CloseFile(file_desc));
   CALL_BF(BF_UnpinBlock(Block));
   return HT_OK;
@@ -56,6 +57,8 @@ HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
       Array[i].ID = *indexDesc;
       break;
     }
+    else if(!Array[i].Name.empty() && i == 19)
+      cout<<"The max number of open files has been reached!"<<endl;
   }
   return HT_OK;
 }
@@ -105,8 +108,62 @@ string decimal_to_binary(int Decimal)
   return Binary;
 }
 
-HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) {
-  //insert code here
+HT_ErrorCode HT_InsertEntry(int indexDesc, Record record) 
+{
+    string ID = decimal_to_binary(record.id);
+    string City = string_to_binary(record.city);
+    string Surname = string_to_binary(record.surname);
+    string Name = string_to_binary(record.name);
+    int GlobalDepth = 2;int LocalDepth = 2;
+    int BlockCounter,NumRecsInBlock,CurBlockNum;
+    bool found;
+    char* Data;
+    BF_Block *Block;
+    NumRecsInBlock = 512 / 59; //blocksize/recsize
+    CALL_BF(BF_GetBlockCounter(Array[indexDesc].ID,&BlockCounter));
+    if(BlockCounter == 0)
+      return HT_ERROR;
+    else if(BlockCounter == 1)
+    {
+      CALL_BF(BF_AllocateBlock(Array[indexDesc].ID,Block)); //thelei unpin
+      Data = BF_Block_GetData(Block);
+      memset(Data,record.id,4); //proswrino
+      memcpy(Data,record.name,15);
+      memcpy(Data,record.surname,20);
+      memcpy(Data,record.city,20);
+      BF_Block_SetDirty(Block);
+    }
+    else if(BlockCounter > 1)
+    {
+      CurBlockNum = BlockCounter - 1;
+      CALL_BF(BF_GetBlock(Array[indexDesc].ID,CurBlockNum,Block));
+      found = false;
+      //how to check how many blocks are in here?
+      Data = BF_Block_GetData(Block);
+      for(int i = 0;i < NumRecsInBlock; i++)
+      {
+        if(Data[i*59] == NULL)
+        {
+          found = true;
+          memset(Data,record.id,4); //proswrino
+          memcpy(Data,record.name,15);
+          memcpy(Data,record.surname,20);
+          memcpy(Data,record.city,20);
+          BF_Block_SetDirty(Block);
+          break;
+        }
+      }
+      if(found == false) //last block is full
+      {
+        CALL_BF(BF_AllocateBlock(Array[indexDesc].ID,Block));
+        Data = BF_Block_GetData(Block);
+        memset(Data,record.id,4); //proswrino
+        memcpy(Data,record.name,15);
+        memcpy(Data,record.surname,20);
+        memcpy(Data,record.city,20);
+        BF_Block_SetDirty(Block);
+      }
+    }
   return HT_OK;
 }
 
