@@ -41,7 +41,7 @@ HT_ErrorCode HT_CreateIndex(const char *filename, int depth) {
   CALL_BF(BF_OpenFile(filename,&file_desc)); //epistrfei to id sto file desc
   CALL_BF(BF_AllocateBlock(file_desc,Block)); //meta thelei unpin,epistrfei to block sth metavlith block
   Data = BF_Block_GetData(Block);
- // memset(Data,depth,BF_BLOCK_SIZE);
+  memset(Data,depth,4);
   CALL_BF(BF_CloseFile(file_desc));
   CALL_BF(BF_UnpinBlock(Block));
   return HT_OK;
@@ -172,6 +172,7 @@ HT_ErrorCode HT_InsertEntry(int indexDesc, Record record)
 
 HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
   int j = 0;
+  int NumRecsInBlock = 512 / 59;
   for(int i = 0;i < 20;i++)
   {
     if(!Array[i].Name.empty())
@@ -185,19 +186,83 @@ HT_ErrorCode HT_PrintAllEntries(int indexDesc, int *id) {
           {
             CALL_BF(BF_GetBlock(Array[j].ID,i,Block));//to kanei pin
             char* Data = BF_Block_GetData(Block);
-            if(id == NULL)
-            {
-              cout<<"Records of Block : "<< i + 1<<" "<<*Data<<endl;
-            }
-            else
-            {
-              cout<<"spera"<<endl;
-            }
+              for(int counter = 0;counter < NumRecsInBlock; counter++)
+              {
+                if(*id == Data[counter*59])
+                {
+                  cout<<"Data of record"<< counter + 1<<"of Block"<<i + 1<<"is : "<<" "<<Data[counter*59]<<endl;
+                }
+                else if(*id == NULL)
+                {
+                  cout<<"Data of record"<< counter + 1<<"of Block"<<i + 1<<"is : "<<" "<<Data[counter*59]<<endl;
+                }
+              }
             CALL_BF(BF_UnpinBlock(Block)); //needs to be here?
           }
       }
     }      
     j++;
+  }
+  return HT_OK;
+}
+
+HT_ErrorCode HashStatistics(char* filename)
+{
+  int *BlockCounter;
+  int TotalRecords = 0;
+  int ID;
+  BF_Block* Block;
+  char* Data;
+  int Max = 0;
+  int Min = 0;
+  long Average = 0.0;
+  int TotalValue = 0;
+  int* indexdesc;
+  for(int i = 0;i < 20;i++)
+  {
+    if(Array[i].Name == filename) //if file is open
+    {
+      ID = Array[i].ID;
+      CALL_BF(BF_GetBlockCounter(ID,BlockCounter));
+      cout<<"Number of blocks in file are : "<<*BlockCounter<<endl;
+      TotalRecords = (*BlockCounter) * (int(512/59));
+      int* Records = new int[TotalRecords];
+      for(int counter = 0;counter<TotalRecords;counter++)
+        Records[counter] = 0;
+      for(int counter = 0;counter < *BlockCounter; counter++)
+      {
+        CALL_BF(BF_GetBlock(ID,counter,Block));//thelei unpin
+        Data = BF_Block_GetData(Block);
+        for(int j = 0; j < 8;j++)
+        {
+          if(Data[j*59])
+          {
+            Records[counter]+=1;
+          }
+        }
+        CALL_BF(BF_UnpinBlock(Block));//needs to be here?
+      }
+      for(int counter = 0;counter < TotalRecords;counter++)
+      {
+        if(Records[counter] > Max)
+          Max = Records[counter];
+        if(Records[counter] < Min)
+          Min = Records[counter];
+        TotalValue += Records[counter];
+      }
+      Average = long(TotalValue/TotalRecords);
+      cout<<"Max number of records in a bucket are : "<<Max<<endl;
+      cout<<"Min number of records in a bucket are : "<<Min<<endl;
+      cout<<"Average number of records in a bucket are : "<<Average<<endl;
+      break;
+    }
+    else if(i == 19) //if the file is not in the array,open it.
+    {
+      HT_OpenIndex(filename,indexdesc);
+      HashStatistics(filename);
+    }
+    else
+      return HT_ERROR;
   }
   return HT_OK;
 }
