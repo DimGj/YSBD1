@@ -58,7 +58,10 @@ HT_ErrorCode HT_OpenIndex(const char *fileName, int *indexDesc){
       break;
     }
     else if(!Array[i].Name.empty() && i == 19)
+    {
       cout<<"The max number of open files has been reached!"<<endl;
+      return HT_ERROR;
+    }
   }
   return HT_OK;
 }
@@ -258,7 +261,8 @@ HT_ErrorCode HashStatistics(char* filename)
     }
     else if(i == 19) //if the file is not in the array,open it.
     {
-      HT_OpenIndex(filename,indexdesc);
+      if(HT_OpenIndex(filename,indexdesc) == HT_ERROR)
+        return HT_ERROR;
       HashStatistics(filename);
     }
     else
